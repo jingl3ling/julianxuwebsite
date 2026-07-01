@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Composer — Portfolio Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..700;1,400..600&family=Space+Grotesk:wght@400;500;600&family=Space+Mono&family=Caveat:wght@600&display=swap');
+
+  :root{
+    --primary:#2D2A25;      /* CORAL charcoal (headings/buttons) */
+    --pressed:#1B1916;      /* near-black — dark sections + pressed */
+    --hover:#5E5848;        /* warm taupe hover */
+    --tint:#D6D5C6;         /* soft sage-grey border */
+    --bg:#F6F3E9;           /* warm ivory canvas */
+    --ink:#2B2824;          /* charcoal text */
+    --muted:#8d8678;        /* warm grey */
+    --pop:#7E8569;          /* muted sage-olive spark (CORAL frame) */
+    --bone:#F3F1E6;
+    --serif:'Playfair Display',Georgia,serif;
+    --sans:'Space Grotesk',sans-serif;
+    --mono:'Space Mono',monospace;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--sans);background:var(--bg);color:var(--ink);
+    line-height:1.3;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  ::selection{background:var(--pop);color:#fff;}
+  img{display:block;max-width:100%;}
+
+  /* scroll progress */
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--pop);z-index:100;}
+
+  /* custom cursor (desktop only) */
+  #cursor{position:fixed;top:0;left:0;width:14px;height:14px;border-radius:50%;
+    background:var(--primary);pointer-events:none;z-index:99;mix-blend-mode:multiply;
+    transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;}
+  #cursor.big{width:54px;height:54px;background:var(--pop);}
+  @media(hover:none){#cursor{display:none;}}
+
+  /* ---------- header ---------- */
+  header{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;
+    justify-content:space-between;padding:1rem 1.6rem;}
+  .wordmark{font-family:var(--serif);font-style:italic;font-size:1.3rem;color:var(--primary);}
+  nav{display:flex;gap:1.4rem;font-size:.95rem;font-weight:500;}
+  nav a{position:relative;}
+  nav a::after{content:"";position:absolute;left:0;bottom:-3px;width:0;height:1.5px;
+    background:var(--primary);transition:width .25s;}
+  nav a:hover::after{width:100%;}
+
+  /* ---------- marquee ---------- */
+  .marquee{overflow:hidden;white-space:nowrap;border-block:1px solid var(--tint);padding:.6rem 0;}
+  .marquee.dark{border-color:rgba(246,241,232,.25);}
+  .marquee span{display:inline-block;padding-left:100%;animation:scroll 28s linear infinite;
+    font-family:var(--serif);font-style:italic;font-size:1.15rem;}
+  .marquee.rev span{animation-direction:reverse;}
+  .marquee .sep{color:var(--pop);font-style:normal;margin:0 .6rem;}
+
+  @keyframes scroll{to{transform:translateX(-100%);}}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 1.6rem;}
+
+  /* ---------- hero ---------- */
+  #top{position:relative;overflow:hidden;}
+  .blob{position:absolute;z-index:0;filter:blur(.3px);opacity:.9;animation:float 14s ease-in-out infinite;}
+  .blob.one{width:230px;top:18%;left:-70px;fill:var(--primary);}
+  .blob.two{width:180px;top:6%;right:-40px;fill:var(--pop);animation-delay:-5s;}
+  @keyframes float{50%{transform:translateY(-26px) rotate(8deg);}}
+  .hero{position:relative;z-index:2;padding:13rem 0 4rem;text-align:center;}
+  .eyebrow{font-family:var(--mono);font-size:.74rem;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--muted);}
+  .hero h1{font-family:var(--serif);font-weight:340;font-size:clamp(2rem,6vw,4.5rem);
+    line-height:.92;letter-spacing:-.02em;color:var(--primary);margin:.4rem 0;}
+  .hero h1 em{font-style:italic;font-weight:300;}
+  .tagline{font-family:var(--serif);font-size:clamp(.7rem,2.4vw,1.3rem);white-space:nowrap;
+    margin:1.8rem auto 0;color:var(--ink);}
+  .tagline em{font-style:italic;color:var(--pop);}
+  .scrollcue{font-family:'Caveat',cursive;font-size:1.7rem;color:var(--primary);
+    display:inline-block;margin-top:1.6rem;transform:rotate(-4deg);}
+  .scrollcue::after{content:" ↓";}
+
+  .meta-row{display:flex;flex-wrap:wrap;gap:1.4rem 2.4rem;justify-content:center;
+    margin-top:2.4rem;padding-top:1.4rem;border-top:1px solid var(--tint);font-size:.92rem;}
+  .meta-row .label{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.2rem;}
+  .meta-row a{border-bottom:1px solid var(--tint);}
+  .meta-row a:hover{color:var(--hover);border-color:var(--hover);}
+
+  /* ---------- hero image: mouse-interactive full-bleed background ---------- */
+  .hero-head{position:relative;width:100%;overflow:hidden;}
+  .hero-bg{position:absolute;inset:-7%;z-index:0;
+    background:url(cloud.jpg) center/cover no-repeat;
+    transition:transform .25s ease-out;will-change:transform;}
+  .hero-head::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(to bottom,rgba(239,231,218,0) 48%,var(--bg) 100%);}
+  .hero-glow{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:radial-gradient(circle 260px at var(--mx,50%) var(--my,35%),
+      rgba(126,133,105,.30),transparent 62%);}
+
+  /* ---------- ambient wavy marquee (now a closing flourish at the bottom) ---------- */
+  .wave-marquee{width:100%;max-width:1100px;margin:2.2rem auto 0;overflow:visible;pointer-events:none;}
+  .wave-marquee svg{width:100%;height:auto;display:block;overflow:visible;}
+  .wave-marquee .line{fill:none;stroke:var(--tint);stroke-width:1;stroke-dasharray:2 9;opacity:.7;}
+  .wave-marquee text{font-family:var(--serif);font-style:italic;font-size:30px;
+    fill:var(--primary);opacity:.17;}
+
+  .intro{display:grid;grid-template-columns:250px 1fr;gap:2.6rem;text-align:left;
+    margin-top:3rem;padding-top:2rem;border-top:1px solid var(--tint);}
+  .intro-side{display:flex;flex-direction:column;gap:1.4rem;}
+  .profile-pic{width:100%;aspect-ratio:3/2;border-radius:4px;flex:none;border:1px solid var(--tint);
+    background:linear-gradient(140deg,#8A7B66,var(--primary));color:rgba(246,241,232,.85);
+    display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+    font-size:.72rem;letter-spacing:.06em;text-align:center;text-transform:uppercase;}
+  .meta-stack{display:flex;flex-direction:column;gap:.75rem;font-size:.92rem;line-height:1.45;}
+  .meta-stack .label{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.1rem;}
+  .meta-stack a{border-bottom:1px solid var(--tint);}
+  .meta-stack a:hover{color:var(--hover);border-color:var(--hover);}
+  .bio{font-family:var(--sans);font-size:1.02rem;line-height:1.65;color:var(--ink);}
+  .bio p{margin-bottom:1rem;}
+  .bio p.lead{font-size:1.32rem;line-height:1.4;}
+  .bio em{font-style:italic;color:var(--primary);}
+  @media(max-width:720px){.intro{grid-template-columns:1fr;}}
+
+  /* ---------- section heads ---------- */
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;
+    margin-bottom:1.8rem;}
+  .sec-head h2{font-family:var(--serif);font-weight:340;font-size:clamp(2.2rem,6vw,4rem);
+    line-height:1;color:var(--primary);}
+  .sec-head h2 em{font-style:italic;}
+  .sec-head .note{font-family:'Caveat',cursive;font-size:1.4rem;color:var(--muted);}
+
+  /* ---------- works: horizontal carousel ---------- */
+  #works{padding:5rem 0 4rem;}
+  .rail-tools{display:flex;gap:.6rem;}
+  .rail-tools button{width:46px;height:46px;border-radius:0;border:1px solid var(--primary);
+    background:transparent;color:var(--primary);font-size:1.1rem;cursor:pointer;transition:.18s;}
+  .rail-tools button:hover{background:var(--primary);color:#fff;}
+  .rail{display:flex;gap:1.6rem;overflow-x:auto;padding:.5rem 1.6rem 1.5rem;
+    scroll-snap-type:x mandatory;scrollbar-width:none;cursor:grab;}
+  .rail::-webkit-scrollbar{display:none;}
+  .rail.drag{cursor:grabbing;}
+  /* image-forward, straight-edged editorial cards */
+  .card{scroll-snap-align:start;flex:0 0 clamp(280px,78vw,400px);
+    background:transparent;border:0;padding:0;transition:transform .3s;}
+  .card:hover{transform:translateY(-6px);}
+  .card .thumb{aspect-ratio:4/3;overflow:hidden;position:relative;border:1px solid var(--tint);}
+  .card .thumb .ph{position:absolute;inset:0;display:flex;align-items:flex-end;padding:1rem;
+    color:#fff;font-family:var(--serif);font-size:1.3rem;transition:transform .5s ease;
+    background:linear-gradient(140deg,var(--primary),var(--pressed));}
+  .card:nth-child(odd) .thumb .ph{background:linear-gradient(140deg,#8A7B66,var(--primary));}
+  .card:hover .thumb .ph{transform:scale(1.06);}
+  .card .idx{font-family:var(--mono);font-size:.78rem;color:var(--pop);
+    margin:1rem 0 .35rem;display:flex;align-items:center;gap:.6rem;}
+  .card .idx::after{content:"";flex:1;height:1px;background:var(--tint);}
+  .card .ttl{font-family:var(--serif);font-size:1.7rem;color:var(--primary);}
+  .card .tag{display:inline-block;font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);margin:.25rem 0 .65rem;}
+  .card .roles{font-size:.9rem;line-height:1.65;color:var(--ink);padding-top:.55rem;
+    border-top:1px solid var(--tint);}
+  .card .roles b{font-weight:600;}
+
+  /* ---------- works v2: featured carousel (one big card + smaller cards fading in from the right) ---------- */
+  #works2{padding:2rem 0 5rem;overflow:hidden;}
+  .c2-viewport{position:relative;overflow:hidden;
+    -webkit-mask-image:linear-gradient(to right,transparent,#000 16%,#000 84%,transparent);
+    mask-image:linear-gradient(to right,transparent,#000 16%,#000 84%,transparent);}
+  .c2-track{display:flex;gap:1.6rem;padding:.5rem 1.6rem;
+    transition:transform .55s cubic-bezier(.4,0,.1,1);will-change:transform;}
+  .c2-card{flex:0 0 auto;width:300px;cursor:pointer;
+    transition:width .55s cubic-bezier(.4,0,.1,1),opacity .55s ease;}
+  .c2-card.active{width:580px;}
+  .c2-card .thumb{aspect-ratio:16/9;overflow:hidden;position:relative;border:1px solid var(--tint);}
+  .c2-card .thumb .ph{position:absolute;inset:0;display:flex;align-items:flex-end;padding:1.1rem;
+    color:#fff;font-family:var(--serif);font-size:1.4rem;
+    background:linear-gradient(140deg,var(--primary),var(--pressed));}
+  .c2-card:nth-child(even) .thumb .ph{background:linear-gradient(140deg,#8A7B66,var(--primary));}
+  .c2-meta{display:flex;align-items:baseline;gap:1rem;margin-top:1rem;}
+  .c2-card .idx{font-family:var(--mono);font-size:.8rem;color:var(--pop);}
+  .c2-card .ttl{font-family:var(--serif);font-size:1.9rem;color:var(--primary);line-height:1;}
+  .c2-card .tag{font-family:var(--mono);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--muted);margin-left:auto;}
+  .c2-card .roles{font-size:.9rem;line-height:1.6;color:var(--ink);margin-top:.6rem;
+    border-top:1px solid var(--tint);padding-top:.5rem;
+    opacity:0;max-height:0;overflow:hidden;transition:opacity .4s ease,max-height .4s ease;}
+  .c2-card.active .roles{opacity:1;max-height:180px;}
+  .c2-nav{justify-content:center;margin-top:1.6rem;}
+  @media(max-width:720px){.c2-card{width:74vw;}.c2-card.active{width:86vw;}}
+
+  /* ---------- listen / Original Music: interactive image (left) + player (right) ---------- */
+  #listen{position:relative;background:var(--pressed);color:var(--bone);}
+  #listen .inner{padding:5rem 0;}
+  #listen .sec-head h2{color:var(--bone);}
+  .listen-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.6rem;align-items:stretch;}
+
+  /* LEFT: interactive floral image, kept apart from the music */
+  .listen-visual{position:relative;overflow:hidden;min-height:520px;
+    border:1px solid rgba(246,241,232,.18);}
+  .listen-bg{position:absolute;inset:-9%;background:url("cloud.jpg") center/cover no-repeat;
+    transition:transform .35s ease-out, background-image .2s;will-change:transform;}
+  .listen-visual .vlabel{position:absolute;left:1rem;bottom:1rem;z-index:2;
+    font-family:var(--mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+    color:rgba(246,241,232,.85);}
+
+  /* RIGHT: the music player */
+  .listen-music{display:flex;flex-direction:column;justify-content:center;}
+  .listen-music .eq{display:flex;gap:5px;align-items:flex-end;height:24px;}
+  .listen-music .eq i{width:5px;background:var(--pop);border-radius:2px;height:30%;}
+  .listen-music.playing .eq i{animation:eq .9s ease-in-out infinite;}
+  .listen-music .eq i:nth-child(2){animation-delay:.15s;}
+  .listen-music .eq i:nth-child(3){animation-delay:.3s;}
+  .listen-music .eq i:nth-child(4){animation-delay:.45s;}
+  @keyframes eq{0%,100%{height:25%;}50%{height:95%;}}
+  .tracklist{list-style:none;}
+  .tracklist li{position:relative;display:flex;align-items:center;gap:1rem;padding:.95rem 0;
+    border-bottom:1px solid rgba(246,241,232,.16);cursor:pointer;transition:.15s;}
+  .tracklist li:hover{padding-left:.4rem;}
+  .t-thumb{width:36px;height:36px;flex:none;border-radius:4px;background-size:cover;
+    background-position:center;border:1px solid rgba(246,241,232,.3);}
+  .tracklist .play{width:36px;height:36px;border-radius:50%;flex:none;
+    border:1px solid rgba(246,241,232,.4);display:flex;align-items:center;justify-content:center;font-size:.7rem;}
+  .tracklist li.active{color:#fff;}
+  .tracklist li.active .play{background:var(--pop);border-color:var(--pop);color:#fff;}
+  .tracklist .t-name{flex:1;font-family:var(--serif);font-size:1.15rem;}
+  .tracklist .t-film{font-size:.85rem;color:rgba(246,241,232,.55);}
+  .tracklist .t-time{font-family:var(--mono);font-size:.8rem;color:rgba(246,241,232,.55);}
+  .bar{position:absolute;left:0;right:0;bottom:-1px;height:3px;
+    background:rgba(246,241,232,.18);overflow:hidden;}
+  .bar i{display:block;height:100%;width:0;background:var(--pop);}
+  .embed-note{margin-top:1.2rem;font-family:var(--mono);font-size:.74rem;color:rgba(246,241,232,.45);}
+  @media(max-width:720px){.listen-grid{grid-template-columns:1fr;}.listen-visual{min-height:300px;}}
+
+  /* ---------- contact ---------- */
+  #contact{padding:7rem 0 6rem;text-align:center;position:relative;overflow:hidden;}
+  #contact .wave-marquee{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    width:150%;max-width:none;margin:0;z-index:0;}
+  #contact .wrap{position:relative;z-index:1;}
+  #contact h2{font-family:var(--serif);font-weight:340;font-size:clamp(2.6rem,9vw,6.5rem);
+    line-height:.95;color:var(--primary);}
+  #contact h2 em{font-style:italic;color:var(--pop);}
+  .email-btn{display:inline-block;margin-top:1.8rem;background:var(--primary);color:#fff;
+    font-size:1.05rem;padding:.85rem 2.2rem;border-radius:999px;transition:.16s;}
+  .email-btn:hover{background:var(--hover);transform:translateY(-2px);}
+  .email-btn:active{background:var(--pressed);}
+  .socials{margin-top:1.6rem;display:flex;gap:1.6rem;justify-content:center;font-size:.95rem;}
+  .socials a{border-bottom:1px solid var(--tint);}
+  .socials a:hover{color:var(--hover);border-color:var(--hover);}
+  footer{padding:2rem 1.6rem;text-align:center;font-family:var(--mono);font-size:.74rem;
+    color:var(--muted);border-top:1px solid var(--tint);}
+
+  /* ---------- scroll reveal ---------- */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+  .reveal.in{opacity:1;transform:none;}
+
+  @media(max-width:720px){
+    nav{display:none;}
+    .player{grid-template-columns:1fr;}
+    .player .art{max-width:170px;}
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="cursor"></div>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <a href="#top" class="wordmark">Juliann Xu</a>
+  <nav>
+    <a href="#works">Works</a>
+    <a href="#listen">Listen</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<!-- ============ HERO ============ -->
+<section id="top">
+  <!-- HERO IMAGE: full-bleed background behind the title, stuck to the top -->
+  <div class="hero-head" id="heroHead">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-glow" id="heroGlow"></div>
+    <div class="wrap hero">
+      <h1 class="reveal">Juliann <em>Xu</em></h1>
+      <p class="tagline reveal">Composer&nbsp;&nbsp;|&nbsp;&nbsp;Orchestrator&nbsp;&nbsp;|&nbsp;&nbsp;Conductor&nbsp;&nbsp;|&nbsp;&nbsp;Engraver&nbsp;&nbsp;|&nbsp;&nbsp;Clarinetist</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <!-- intro: profile photo + meta + bio -->
+    <div class="intro reveal">
+      <div class="intro-side">
+        <!-- PLACEHOLDER 2: profile photo -->
+        <div class="profile-pic"><span>Profile<br>photo</span></div>
+        <div class="meta-stack">
+          <div><span class="label">Based in</span>Los Angeles, CA</div>
+          <div><span class="label">From</span>Champaign, Illinois</div>
+          <div><span class="label">Training</span>Berklee College of Music</div>
+          <div><span class="label">Email</span><a href="mailto:juliannzxu@gmail.com">juliannzxu@gmail.com</a></div>
+          <div><span class="label">Instagram</span><a href="https://instagram.com/juliannclari" target="_blank">@juliannclari ↗</a></div>
+          <div><span class="label">IMDb</span><a href="#" target="_blank">Juliann Xu ↗</a></div>
+        </div>
+      </div>
+      <div class="bio">
+        <p class="lead">Juliann Xu is a film composer from Champaign, Illinois, trained at Berklee College of Music. Now based in Los Angeles, she is a classically trained clarinetist who specializes in orchestral music, and loves creating hybrid scores with a mix of synths and traditional instruments. Her credits include <em>Wallaby Drew</em>, an Emerson Frames Per Second film, <em>The 97th Academy Awards</em>, and <em>El Año Decisivo</em>, a documentary film about the Spanish Transition to Democracy.</p>
+        <p>In addition to her studies, Juliann served as the Executive Director of the award-winning Berklee Motion Picture Orchestra, where she managed 70+ orchestra members, produced, and performed in concerts. She graduated Summa Cum Laude, and was awarded the Wachter Fellowship, Don Wilkins Award, Thrive Scholarship, and Woodwind Scholarship, along with being on the Dean's List in every semester at Berklee.</p>
+        <p>In January 2025, Juliann began working at Fine Line Music Service in Los Angeles under the mentorship of Greg Jamrok, Abraham Libbos, and Josef Zimmerman. As she grows as an engraver, orchestrator, and composer, she hopes to build meaningful connections centered around storytelling and community.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WORKS (horizontal carousel) ============ -->
+<section id="works">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <h2>Selected <em>Works</em> (version 1)</h2>
+        <span class="note">drag, or use the arrows →</span>
+      </div>
+      <div class="rail-tools">
+        <button id="prev" aria-label="Previous">←</button>
+        <button id="next" aria-label="Next">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- rail breaks out of .wrap so cards bleed off-screen -->
+  <div class="rail" id="rail">
+    <!-- SWAP each card with a real project -->
+    <article class="card"><div class="thumb"><div class="ph">Still / Poster</div></div>
+      <div class="idx">01</div><span class="tag">Series · Streaming</span>
+      <div class="ttl">Project One</div>
+      <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Lead, Lead, Lead</b><br>Composer: <b>Your Name</b><br>Studio: <b>Studio Name</b></div>
+    </article>
+    <article class="card"><div class="thumb"><div class="ph">Still / Poster</div></div>
+      <div class="idx">02</div><span class="tag">Feature Film</span>
+      <div class="ttl">Project Two</div>
+      <div class="roles">Director: <b>Director Name</b><br>Producers: <b>Producer, Producer</b><br>Composer: <b>Your Name</b><br>Studio: <b>Studio Name</b></div>
+    </article>
+    <article class="card"><div class="thumb"><div class="ph">Still / Poster</div></div>
+      <div class="idx">03</div><span class="tag">Feature · Animation</span>
+      <div class="ttl">Project Three</div>
+      <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Voice, Voice, Voice</b><br>Arrangements: <b>Your Name</b><br>Studio: <b>Studio Name</b></div>
+    </article>
+    <article class="card"><div class="thumb"><div class="ph">Still / Poster</div></div>
+      <div class="idx">04</div><span class="tag">Stage · Theatre</span>
+      <div class="ttl">Project Four</div>
+      <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Lead, Lead, Lead</b><br>Music Associate: <b>Your Name</b><br>Venue: <b>Theatre Name</b></div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ WORKS v2 (featured carousel) ============ -->
+<section id="works2">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <h2>Selected <em>Works</em> (version 2)</h2>
+        <span class="note">featured — click a card, or use the arrows below</span>
+      </div>
+    </div>
+  </div>
+  <div class="c2-viewport">
+    <div class="c2-track" id="c2track">
+      <article class="c2-card active">
+        <div class="thumb"><div class="ph">Still / Poster</div></div>
+        <div class="c2-meta"><span class="idx">01</span><span class="ttl">Project One</span><span class="tag">Series · Streaming</span></div>
+        <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Lead, Lead, Lead</b><br>Composer: <b>Your Name</b><br>Studio: <b>Studio Name</b></div>
+      </article>
+      <article class="c2-card">
+        <div class="thumb"><div class="ph">Still / Poster</div></div>
+        <div class="c2-meta"><span class="idx">02</span><span class="ttl">Project Two</span><span class="tag">Feature Film</span></div>
+        <div class="roles">Director: <b>Director Name</b><br>Producers: <b>Producer, Producer</b><br>Composer: <b>Your Name</b><br>Studio: <b>Studio Name</b></div>
+      </article>
+      <article class="c2-card">
+        <div class="thumb"><div class="ph">Still / Poster</div></div>
+        <div class="c2-meta"><span class="idx">03</span><span class="ttl">Project Three</span><span class="tag">Feature · Animation</span></div>
+        <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Voice, Voice, Voice</b><br>Arrangements: <b>Your Name</b><br>Studio: <b>Studio Name</b></div>
+      </article>
+      <article class="c2-card">
+        <div class="thumb"><div class="ph">Still / Poster</div></div>
+        <div class="c2-meta"><span class="idx">04</span><span class="ttl">Project Four</span><span class="tag">Stage · Theatre</span></div>
+        <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Lead, Lead, Lead</b><br>Music Associate: <b>Your Name</b><br>Venue: <b>Theatre Name</b></div>
+      </article>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="rail-tools c2-nav">
+      <button id="c2prev" aria-label="Previous">←</button>
+      <button id="c2next" aria-label="Next">→</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LISTEN (dark) ============ -->
+<section id="listen">
+  <div class="inner wrap">
+    <div class="listen-grid">
+
+      <!-- LEFT: interactive floral image (move cursor — spotlight + parallax) -->
+      <div class="listen-visual reveal" id="listenVisual">
+        <div class="listen-bg" id="listenBg"></div>
+        <span class="vlabel">move your cursor →</span>
+      </div>
+
+      <!-- RIGHT: the music player (separate from the image interaction) -->
+      <!-- In Wix, replace the .tracklist with a Spotify / SoundCloud / Disco iframe embed. -->
+      <div class="listen-music reveal" id="player">
+        <div class="sec-head">
+          <h2>Original <em>Music</em></h2>
+          <div class="eq"><i></i><i></i><i></i><i></i></div>
+        </div>
+        <ul class="tracklist" id="tracklist">
+          <li class="active" data-dur="184" data-image="cloud.jpg"><span class="play">▶</span><span class="t-thumb" style="background-image:url('cloud.jpg')"></span><span class="t-name">Thousand Cranes</span><span class="t-film">Project One</span><span class="t-time">3:04</span></li>
+          <li data-dur="142" data-image="image 33.png"><span class="play">▶</span><span class="t-thumb" style="background-image:url('image 33.png')"></span><span class="t-name">First Light</span><span class="t-film">Project Two</span><span class="t-time">2:22</span></li>
+          <li data-dur="208" data-image="cloud.jpg"><span class="play">▶</span><span class="t-thumb" style="background-image:url('cloud.jpg')"></span><span class="t-name">The Long Way Home</span><span class="t-film">Project Three</span><span class="t-time">3:28</span></li>
+          <li data-dur="166" data-image="image 33.png"><span class="play">▶</span><span class="t-thumb" style="background-image:url('image 33.png')"></span><span class="t-name">Curtain</span><span class="t-film">Project Four</span><span class="t-time">2:46</span></li>
+        </ul>
+        <div class="bar"><i id="prog2"></i></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact">
+  <!-- waving marquee as the contact background -->
+  <div class="wave-marquee" aria-hidden="true">
+    <svg viewBox="0 0 1300 175" preserveAspectRatio="xMidYMid meet">
+      <path id="wavepath" class="line"
+        d="M-325,27 S-108,147 0,147 S217,27 325,27 S542,147 650,147 S867,27 975,27 S1192,147 1300,147"/>
+      <text><textPath id="wavetext" href="#wavepath" startOffset="0"></textPath></text>
+    </svg>
+  </div>
+  <div class="wrap">
+    <p class="eyebrow reveal">Say hello</p>
+    <a class="email-btn reveal" href="mailto:juliannzxu@gmail.com">juliannzxu@gmail.com</a>
+    <div class="socials reveal">
+      <a href="https://instagram.com/juliannclari" target="_blank">Instagram ↗</a>
+      <a href="#" target="_blank">IMDb ↗</a>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Juliann Xu — Film Composer · Prototype</footer>
+
+<script>
+  // scroll progress bar
+  const prog=document.getElementById('progress');
+  addEventListener('scroll',()=>{
+    const h=document.documentElement;
+    prog.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+  });
+
+  // custom cursor + grow over interactive things
+  const cur=document.getElementById('cursor');
+  addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';});
+  document.querySelectorAll('a,button,.card,.tracklist li').forEach(el=>{
+    el.addEventListener('mouseenter',()=>cur.classList.add('big'));
+    el.addEventListener('mouseleave',()=>cur.classList.remove('big'));
+  });
+
+  // scroll reveal
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // mouse-interactive hero background: parallax banner + cursor glow
+  const heroHead=document.getElementById('heroHead');
+  if(heroHead){
+    const bg=document.getElementById('heroBg'), glow=document.getElementById('heroGlow');
+    heroHead.addEventListener('pointermove',e=>{
+      const r=heroHead.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
+      glow.style.setProperty('--mx',(x*100).toFixed(1)+'%');
+      glow.style.setProperty('--my',(y*100).toFixed(1)+'%');
+      bg.style.transform='scale(1.08) translate('+((x-.5)*-26).toFixed(1)+'px,'+((y-.5)*-20).toFixed(1)+'px)';
+    });
+    heroHead.addEventListener('pointerleave',()=>{bg.style.transform='';});
+  }
+
+  // music section: image pans slightly toward the cursor (interaction confined to the LEFT image)
+  const visual=document.getElementById('listenVisual');
+  const lbg=document.getElementById('listenBg');
+  if(visual){
+    visual.addEventListener('pointermove',e=>{
+      const r=visual.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width, y=(e.clientY-r.top)/r.height;
+      lbg.style.transform='scale(1.08) translate('+((x-.5)*40).toFixed(1)+'px,'+((y-.5)*34).toFixed(1)+'px)';
+    });
+    visual.addEventListener('pointerleave',()=>{lbg.style.transform='';});
+  }
+
+  // ambient wavy marquee: words scroll seamlessly along the curved path
+  const tp=document.getElementById('wavetext');
+  if(tp){
+    const REP=14, phrase='Film Scoring • Orchestral • Hybrid • Synths & Strings • ';
+    tp.textContent=phrase.repeat(REP);
+    let unit=0, off=0, speed=0.6;
+    requestAnimationFrame(()=>{unit=tp.getComputedTextLength()/REP; run();});
+    function run(){off-=speed; if(off<=-unit) off+=unit; tp.setAttribute('startOffset',off); requestAnimationFrame(run);}
+    // tiny bit of life: nudge speed up while the cursor is over the contact section
+    const cz=document.getElementById('contact');
+    cz.addEventListener('pointermove',()=>{speed=1.4;clearTimeout(cz._t);cz._t=setTimeout(()=>speed=0.6,400);});
+  }
+
+  // works rail: arrows + drag-to-scroll
+  const rail=document.getElementById('rail');
+  const step=()=>Math.min(440,rail.clientWidth*.8);
+  document.getElementById('next').onclick=()=>rail.scrollBy({left:step(),behavior:'smooth'});
+  document.getElementById('prev').onclick=()=>rail.scrollBy({left:-step(),behavior:'smooth'});
+  let down=false,sx=0,sl=0;
+  rail.addEventListener('pointerdown',e=>{down=true;rail.classList.add('drag');sx=e.pageX;sl=rail.scrollLeft;});
+  addEventListener('pointerup',()=>{down=false;rail.classList.remove('drag');});
+  rail.addEventListener('pointermove',e=>{if(down)rail.scrollLeft=sl-(e.pageX-sx);});
+
+  // mock player
+  const player=document.getElementById('player');
+  const items=[...document.querySelectorAll('#tracklist li')];
+  const pbar=document.getElementById('prog2'), bar=pbar.parentElement;
+  let active=0,pos=0,timer=null,playing=false;
+  function setActive(i){items.forEach(li=>{li.classList.remove('active');li.querySelector('.play').textContent='▶';});
+    items[i].classList.add('active');active=i;pos=0;pbar.style.width='0%';
+    items[i].appendChild(bar);          // move the progress bar under the playing track
+    const img=items[i].dataset.image;   // each track can swap the left image
+    if(img&&lbg)lbg.style.backgroundImage='url("'+img+'")';}
+  items[active].appendChild(bar);       // place under the first track on load
+  function play(){playing=true;player.classList.add('playing');items[active].querySelector('.play').textContent='❚❚';
+    clearInterval(timer);const dur=+items[active].dataset.dur;
+    timer=setInterval(()=>{pos++;pbar.style.width=Math.min(100,pos/dur*100)+'%';
+      if(pos>=dur){setActive((active+1)%items.length);play();}},1000);}
+  function pause(){playing=false;player.classList.remove('playing');items[active].querySelector('.play').textContent='▶';clearInterval(timer);}
+  items.forEach((li,i)=>li.addEventListener('click',()=>{i===active?(playing?pause():play()):(setActive(i),play());}));
+
+  // works v2: featured carousel — big active card, smaller cards fading in from the right
+  const c2=document.getElementById('c2track');
+  if(c2){
+    const cards=[...c2.children], vp=c2.parentElement; let ci=0;
+    let activeW=580, smallW=300, gap=26, padL=26;
+    function measure(){                       // read real sizes at rest (not mid-transition)
+      padL=cards[0].offsetLeft;
+      const a=cards.find(c=>c.classList.contains('active'))||cards[0];
+      const s=cards.find(c=>!c.classList.contains('active'))||a;
+      activeW=a.offsetWidth; smallW=s.offsetWidth;
+      gap=cards[1].offsetLeft-cards[0].offsetLeft-cards[0].offsetWidth;
+    }
+    function c2render(){
+      cards.forEach((c,i)=>{c.classList.toggle('active',i===ci);
+        const d=Math.abs(i-ci); c.style.opacity=d===0?1:Math.max(.3,1-d*0.26);});
+      // center using FINAL sizes (cards before the active one are all small)
+      const activeLeft=padL+ci*(smallW+gap);
+      const tx=vp.clientWidth/2-(activeLeft+activeW/2);
+      c2.style.transform='translateX('+tx.toFixed(1)+'px)';
+    }
+    document.getElementById('c2next').onclick=()=>{ci=Math.min(cards.length-1,ci+1);c2render();};
+    document.getElementById('c2prev').onclick=()=>{ci=Math.max(0,ci-1);c2render();};
+    cards.forEach((c,i)=>c.addEventListener('click',()=>{ci=i;c2render();}));
+    measure(); c2render();
+    addEventListener('resize',()=>{measure();c2render();});
+  }
+</script>
+</body>
+</html>
