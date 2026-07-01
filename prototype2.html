@@ -300,8 +300,8 @@
           <div><span class="label">From</span>Champaign, Illinois</div>
           <div><span class="label">Training</span>Berklee College of Music</div>
           <div><span class="label">Email</span><a href="mailto:juliannzxu@gmail.com">juliannzxu@gmail.com</a></div>
-          <div><span class="label">Instagram</span><a href="https://instagram.com/juliannclari" target="_blank">@juliannclari ↗</a></div>
-          <div><span class="label">IMDb</span><a href="#" target="_blank">Juliann Xu ↗</a></div>
+          <div><span class="label">Instagram</span><a href="https://instagram.com/juliannclari" target="_blank">@juliannclari ↗&#xFE0E;</a></div>
+          <div><span class="label">IMDb</span><a href="#" target="_blank">Juliann Xu ↗&#xFE0E;</a></div>
         </div>
       </div>
       <div class="bio">
@@ -373,10 +373,10 @@
           <div class="eq"><i></i><i></i><i></i><i></i></div>
         </div>
         <ul class="tracklist" id="tracklist">
-          <li class="active" data-dur="184" data-image="cloud.jpg"><span class="play">▶</span><span class="t-thumb" style="background-image:url('cloud.jpg')"></span><span class="t-name">Thousand Cranes</span><span class="t-film">Project One</span><span class="t-time">3:04</span></li>
-          <li data-dur="142" data-image="image 33.png"><span class="play">▶</span><span class="t-thumb" style="background-image:url('image 33.png')"></span><span class="t-name">First Light</span><span class="t-film">Project Two</span><span class="t-time">2:22</span></li>
-          <li data-dur="208" data-image="cloud.jpg"><span class="play">▶</span><span class="t-thumb" style="background-image:url('cloud.jpg')"></span><span class="t-name">The Long Way Home</span><span class="t-film">Project Three</span><span class="t-time">3:28</span></li>
-          <li data-dur="166" data-image="image 33.png"><span class="play">▶</span><span class="t-thumb" style="background-image:url('image 33.png')"></span><span class="t-name">Curtain</span><span class="t-film">Project Four</span><span class="t-time">2:46</span></li>
+          <li class="active" data-dur="184" data-image="cloud.jpg"><span class="play">▶&#xFE0E;</span><span class="t-thumb" style="background-image:url('cloud.jpg')"></span><span class="t-name">Thousand Cranes</span><span class="t-film">Project One</span><span class="t-time">3:04</span></li>
+          <li data-dur="142" data-image="image 33.png"><span class="play">▶&#xFE0E;</span><span class="t-thumb" style="background-image:url('image 33.png')"></span><span class="t-name">First Light</span><span class="t-film">Project Two</span><span class="t-time">2:22</span></li>
+          <li data-dur="208" data-image="cloud.jpg"><span class="play">▶&#xFE0E;</span><span class="t-thumb" style="background-image:url('cloud.jpg')"></span><span class="t-name">The Long Way Home</span><span class="t-film">Project Three</span><span class="t-time">3:28</span></li>
+          <li data-dur="166" data-image="image 33.png"><span class="play">▶&#xFE0E;</span><span class="t-thumb" style="background-image:url('image 33.png')"></span><span class="t-name">Curtain</span><span class="t-film">Project Four</span><span class="t-time">2:46</span></li>
         </ul>
         <div class="bar"><i id="prog2"></i></div>
       </div>
@@ -399,8 +399,8 @@
     <p class="eyebrow reveal">Say hello</p>
     <a class="email-btn reveal" href="mailto:juliannzxu@gmail.com">juliannzxu@gmail.com</a>
     <div class="socials reveal">
-      <a href="https://instagram.com/juliannclari" target="_blank">Instagram ↗</a>
-      <a href="#" target="_blank">IMDb ↗</a>
+      <a href="https://instagram.com/juliannclari" target="_blank">Instagram ↗&#xFE0E;</a>
+      <a href="#" target="_blank">IMDb ↗&#xFE0E;</a>
     </div>
   </div>
 </section>
@@ -480,7 +480,7 @@
   const items=[...document.querySelectorAll('#tracklist li')];
   const pbar=document.getElementById('prog2'), bar=pbar.parentElement;
   let active=0,pos=0,timer=null,playing=false;
-  function setActive(i){items.forEach(li=>{li.classList.remove('active');li.querySelector('.play').textContent='▶';});
+  function setActive(i){items.forEach(li=>{li.classList.remove('active');li.querySelector('.play').textContent='▶︎';});
     items[i].classList.add('active');active=i;pos=0;pbar.style.width='0%';
     items[i].appendChild(bar);          // move the progress bar under the playing track
     const img=items[i].dataset.image;   // each track can swap the left image
@@ -490,7 +490,7 @@
     clearInterval(timer);const dur=+items[active].dataset.dur;
     timer=setInterval(()=>{pos++;pbar.style.width=Math.min(100,pos/dur*100)+'%';
       if(pos>=dur){setActive((active+1)%items.length);play();}},1000);}
-  function pause(){playing=false;player.classList.remove('playing');items[active].querySelector('.play').textContent='▶';clearInterval(timer);}
+  function pause(){playing=false;player.classList.remove('playing');items[active].querySelector('.play').textContent='▶︎';clearInterval(timer);}
   items.forEach((li,i)=>li.addEventListener('click',()=>{i===active?(playing?pause():play()):(setActive(i),play());}));
 
   // works v2: featured carousel — big active card, smaller cards fading in from the right
