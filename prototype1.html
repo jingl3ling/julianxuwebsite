@@ -103,8 +103,8 @@
 
   /* ---------- ambient wavy marquee (now a closing flourish at the bottom) ---------- */
   .wave-marquee{width:100%;max-width:1100px;margin:2.2rem auto 0;overflow:visible;pointer-events:none;}
-  .wave-marquee svg{width:100%;height:auto;display:block;overflow:visible;}
-  .wave-marquee .line{fill:none;stroke:var(--tint);stroke-width:1;stroke-dasharray:2 9;opacity:.7;}
+  .wave-marquee svg{width:100%;height:210px;display:block;overflow:visible;}
+  .wave-marquee .wlayer{fill:var(--primary);stroke:none;}
   .wave-marquee text{font-family:var(--serif);font-style:italic;font-size:30px;
     fill:var(--primary);opacity:.17;}
 
@@ -236,8 +236,8 @@
 
   /* ---------- contact ---------- */
   #contact{padding:7rem 0 6rem;text-align:center;position:relative;overflow:hidden;}
-  #contact .wave-marquee{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-    width:150%;max-width:none;margin:0;z-index:0;}
+  #contact .wave-marquee{position:absolute;left:0;right:0;bottom:0;top:auto;transform:none;
+    width:100%;max-width:none;margin:0;z-index:0;}
   #contact .wrap{position:relative;z-index:1;}
   #contact h2{font-family:var(--serif);font-weight:340;font-size:clamp(2.6rem,9vw,6.5rem);
     line-height:.95;color:var(--primary);}
@@ -318,7 +318,7 @@
   <div class="wrap">
     <div class="sec-head reveal">
       <div>
-        <h2>Selected <em>Works</em> (version 1)</h2>
+        <h2>Selected <em>Works</em></h2>
         <span class="note">drag, or use the arrows →</span>
       </div>
       <div class="rail-tools">
@@ -351,48 +351,6 @@
       <div class="ttl">Project Four</div>
       <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Lead, Lead, Lead</b><br>Music Associate: <b>Your Name</b><br>Venue: <b>Theatre Name</b></div>
     </article>
-  </div>
-</section>
-
-<!-- ============ WORKS v2 (featured carousel) ============ -->
-<section id="works2">
-  <div class="wrap">
-    <div class="sec-head reveal">
-      <div>
-        <h2>Selected <em>Works</em> (version 2)</h2>
-        <span class="note">featured — click a card, or use the arrows below</span>
-      </div>
-    </div>
-  </div>
-  <div class="c2-viewport">
-    <div class="c2-track" id="c2track">
-      <article class="c2-card active">
-        <div class="thumb"><div class="ph">Still / Poster</div></div>
-        <div class="c2-meta"><span class="idx">01</span><span class="ttl">Project One</span><span class="tag">Series · Streaming</span></div>
-        <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Lead, Lead, Lead</b><br>Composer: <b>Your Name</b><br>Studio: <b>Studio Name</b></div>
-      </article>
-      <article class="c2-card">
-        <div class="thumb"><div class="ph">Still / Poster</div></div>
-        <div class="c2-meta"><span class="idx">02</span><span class="ttl">Project Two</span><span class="tag">Feature Film</span></div>
-        <div class="roles">Director: <b>Director Name</b><br>Producers: <b>Producer, Producer</b><br>Composer: <b>Your Name</b><br>Studio: <b>Studio Name</b></div>
-      </article>
-      <article class="c2-card">
-        <div class="thumb"><div class="ph">Still / Poster</div></div>
-        <div class="c2-meta"><span class="idx">03</span><span class="ttl">Project Three</span><span class="tag">Feature · Animation</span></div>
-        <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Voice, Voice, Voice</b><br>Arrangements: <b>Your Name</b><br>Studio: <b>Studio Name</b></div>
-      </article>
-      <article class="c2-card">
-        <div class="thumb"><div class="ph">Still / Poster</div></div>
-        <div class="c2-meta"><span class="idx">04</span><span class="ttl">Project Four</span><span class="tag">Stage · Theatre</span></div>
-        <div class="roles">Director: <b>Director Name</b><br>Starring: <b>Lead, Lead, Lead</b><br>Music Associate: <b>Your Name</b><br>Venue: <b>Theatre Name</b></div>
-      </article>
-    </div>
-  </div>
-  <div class="wrap">
-    <div class="rail-tools c2-nav">
-      <button id="c2prev" aria-label="Previous">←</button>
-      <button id="c2next" aria-label="Next">→</button>
-    </div>
   </div>
 </section>
 
@@ -431,10 +389,11 @@
 <section id="contact">
   <!-- waving marquee as the contact background -->
   <div class="wave-marquee" aria-hidden="true">
-    <svg viewBox="0 0 1300 175" preserveAspectRatio="xMidYMid meet">
-      <path id="wavepath" class="line"
-        d="M-325,27 S-108,147 0,147 S217,27 325,27 S542,147 650,147 S867,27 975,27 S1192,147 1300,147"/>
-      <text><textPath id="wavetext" href="#wavepath" startOffset="0"></textPath></text>
+    <svg viewBox="0 0 1300 210" preserveAspectRatio="none">
+      <path class="wlayer" data-base="96"  data-amp="26" data-k="520" data-sp="0.9"  data-op=".12"></path>
+      <path class="wlayer" data-base="122" data-amp="22" data-k="620" data-sp="1.05" data-op=".18"></path>
+      <path class="wlayer" data-base="150" data-amp="30" data-k="700" data-sp="0.8"  data-op=".26"></path>
+      <path class="wlayer" data-base="176" data-amp="18" data-k="560" data-sp="1.15" data-op=".36"></path>
     </svg>
   </div>
   <div class="wrap">
@@ -446,8 +405,6 @@
     </div>
   </div>
 </section>
-
-<footer>© 2026 Juliann Xu — Film Composer · Prototype</footer>
 
 <script>
   // scroll progress bar
@@ -495,17 +452,24 @@
     visual.addEventListener('pointerleave',()=>{lbg.style.transform='';});
   }
 
-  // ambient wavy marquee: words scroll seamlessly along the curved path
-  const tp=document.getElementById('wavetext');
-  if(tp){
-    const REP=14, phrase='Film Scoring • Orchestral • Hybrid • Synths & Strings • ';
-    tp.textContent=phrase.repeat(REP);
-    let unit=0, off=0, speed=0.6;
-    requestAnimationFrame(()=>{unit=tp.getComputedTextLength()/REP; run();});
-    function run(){off-=speed; if(off<=-unit) off+=unit; tp.setAttribute('startOffset',off); requestAnimationFrame(run);}
-    // tiny bit of life: nudge speed up while the cursor is over the contact section
+  // layered solid waves at the bottom; travel + speed up while the cursor is over contact
+  const wlayers=[...document.querySelectorAll('#contact .wlayer')].map((el,i)=>{
+    el.setAttribute('fill-opacity', el.dataset.op);
+    return {el, base:+el.dataset.base, amp:+el.dataset.amp,
+            k:2*Math.PI/(+el.dataset.k), sp:+el.dataset.sp, phase:i*1.9};
+  });
+  if(wlayers.length){
+    const H=210;
+    let px=0.6, target=0.6;                      // px/frame — matches p2 (idle .6 / hover 1.4)
+    function buildW(L){
+      let d='M -80,'+H+' L -80,'+(L.base+L.amp*Math.sin(L.k*-80+L.phase)).toFixed(1);
+      for(let x=-60;x<=1380;x+=12) d+=' L '+x+','+(L.base+L.amp*Math.sin(L.k*x+L.phase)).toFixed(1);
+      L.el.setAttribute('d', d+' L 1380,'+H+' Z');
+    }
+    function loopW(){ px+=(target-px)*0.08; wlayers.forEach(L=>{L.phase-=px*L.sp*L.k; buildW(L);}); requestAnimationFrame(loopW); }
+    loopW();
     const cz=document.getElementById('contact');
-    cz.addEventListener('pointermove',()=>{speed=1.4;clearTimeout(cz._t);cz._t=setTimeout(()=>speed=0.6,400);});
+    if(cz) cz.addEventListener('pointermove',()=>{target=1.4;clearTimeout(cz._t);cz._t=setTimeout(()=>target=0.6,400);});
   }
 
   // works rail: arrows + drag-to-scroll
